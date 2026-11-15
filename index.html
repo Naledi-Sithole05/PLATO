@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Platō | Order</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header>
+<button id="logo" aria-label="Platō home"><img src="assets/logo.png" alt="PLATŌ"></button>
+<nav class="nav"><button onclick="home()"><img src="assets/Home.png" alt="">Home</button><button onclick="location.hash='stores'"><img src="assets/Map_pin.png" alt="">Store Location</button><button onclick="cart(1)"><img src="assets/Shopping_bag.png" alt="">Shopping</button><button onclick="alert('Account: connect your login system here.')"><img src="assets/User.png" alt="">Account</button></nav>
+<div class="sp"></div><div class="sw"><input id="q" type="search" placeholder="Search drinks, food, shop…" aria-label="Search menu" autocomplete="off"><div id="dd"></div></div>
+<button class="ib" id="cartb" onclick="cart(1)" aria-label="Open cart"><img src="assets/Shopping_cart.png" alt=""><span id="cnt">0</span></button>
+</header>
+<div class="modes" id="modes"><span>How would you like to order?</span></div>
+<main id="app"></main>
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<div id="drawer"><div class="row"><h2>Your Order</h2><button onclick="cart(0)" aria-label="Close">✕</button></div><div id="dl"></div><div id="df"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="js/config.js"defer></script>
+<script src="js/data.js"defer></script>
+<script src="js/state.js"defer></script>
+<script src="js/api.js"defer></script>
+<script src="js/ui.js"defer></script>
+<script src="js/menu.js"defer></script>
+<script src="js/search.js"defer></script>
+<script src="js/locator.js"defer></script>
+<script src="js/product.js"defer></script>
+<script src="js/cart.js"defer></script>
+<script src="js/checkout.js"defer></script>
+<script src="js/app.js"defer></script>
+</body></html>

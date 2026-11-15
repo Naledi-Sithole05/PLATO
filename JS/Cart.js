@@ -1,0 +1,7 @@
+// Step 2: cart drawer (review, quantities, remove) and totals.
+const sub=()=>S.cart.reduce((a,l)=>a+l.unit*l.qty,0),fee=()=>S.mode=='Delivery'&&S.cart.length?25:0;
+function upd(){$('#cnt').textContent=S.cart.reduce((a,l)=>a+l.qty,0);
+ $('#dl').innerHTML=S.cart.length?S.cart.map((l,k)=>`<div class="line" style="margin:0 24px"><div class="row"><b>${l.name}</b><span>${R(l.unit*l.qty)}</span></div><small>${l.sp||'No customisations'}</small><div class="row"><div class="qty"><button onclick="qty(${k},-1)">−</button>${l.qty}<button onclick="qty(${k},1)">+</button></div><button class="rm" onclick="S.cart.splice(${k},1);save();upd()">Remove</button></div></div>`).join(''):'<p class="msg">Your order is empty.<br>Pick an item and choose your options to get started.</p>';
+ $('#df').innerHTML=S.cart.length?`<div style="padding:20px 24px;border-top:1px solid var(--line)"><div class="row"><span>Subtotal</span><b>${R(sub())}</b></div><p class="d" style="color:var(--mut);font-size:13px;margin:6px 0 14px">${S.mode=='Delivery'?'Delivery fee added at checkout.':'Next: confirm details & payment.'}</p><button class="btn" onclick="cart(0);location.hash='checkout';render()">Checkout</button></div>`:''}
+function qty(k,d){S.cart[k].qty+=d;if(S.cart[k].qty<1)S.cart.splice(k,1);save();upd()}
+function cart(o){$('#drawer').classList.toggle('show',!!o)}
