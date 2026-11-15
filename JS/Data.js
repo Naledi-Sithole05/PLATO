@@ -3,7 +3,10 @@ const SIZES=[['Small',0],['Medium',8],['Large',14]],MILK=[['Oat Milk',0],['Full 
 const EXTRAS=[['Vanilla Syrup',20],['Extra Shot',10]];
 const G={drink:[['Size',SIZES],['Milk',MILK]],none:[],beans:[['Grind',[['Whole Bean',0],['Espresso',0],['Filter',0]]]],cloth:[['Size',[['S',0],['M',0],['L',0],['XL',0]]]]};
 // Menu: sections → sub-chips → items. img:'' → add your own image path later (e.g. 'images/latte.jpg')
-const I=(id,sec,sub,name,desc,price,g='none',img='')=>({id,sec,sub,name,desc,price,g,img});
+// IMAGES: every item looks for its photo at images/<section>/<item-name>.png automatically
+// e.g. 'Fresh Croissant' -> images/food/fresh-croissant.png  (pass a 8th argument to use a different path or URL)
+const slug=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const I=(id,sec,sub,name,desc,price,g='none',img='')=>({id,sec,sub,name,desc,price,g,img:img||`images/${slug(sec)}/${slug(name)}.png`});
 let ITEMS=[
 I('f1','Featured','Featured','Iced Latte','Smooth espresso over ice with milk',56,'drink'),
 I('f2','Featured','Featured','Cappuccino','Espresso with velvety steamed foam',67,'drink'),
