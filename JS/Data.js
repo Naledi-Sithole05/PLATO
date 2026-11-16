@@ -2,9 +2,7 @@
 const SIZES=[['Small',0],['Medium',8],['Large',14]],MILK=[['Oat Milk',0],['Full Cream',0],['Soy Milk',0],['Almond',0]];
 const EXTRAS=[['Vanilla Syrup',20],['Extra Shot',10]];
 const G={drink:[['Size',SIZES],['Milk',MILK]],none:[],beans:[['Grind',[['Whole Bean',0],['Espresso',0],['Filter',0]]]],cloth:[['Size',[['S',0],['M',0],['L',0],['XL',0]]]]};
-// Menu: sections → sub-chips → items. img:'' → add your own image path later (e.g. 'images/latte.jpg')
-// IMAGES: every item looks for its photo at images/<section>/<item-name>.png automatically
-// e.g. 'Fresh Croissant' -> images/food/fresh-croissant.png  (pass a 8th argument to use a different path or URL)
+
 const slug=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const I=(id,sec,sub,name,desc,price,g='none',img='')=>({id,sec,sub,name,desc,price,g,img:img||`images/${slug(sec)}/${slug(name)}.png`});
 let ITEMS=[
@@ -48,7 +46,7 @@ I('h5','Shop','Clothing','Platō Tee','Soft cotton, embroidered logo',260,'cloth
 I('h6','Shop','Clothing','Platō Cap','Adjustable, forest green',180),
 I('h7','Shop','Machines','Home Espresso Machine','15-bar espresso maker',3499)];
 const SECS=['Featured','Coffee','Non-Coffee','Smoothies & Shakes','Food','Shop'];
-// PLACEHOLDER branches (real list loads from Stockist on plato.coffee). x,y = position on the fake map (0-100)
+
 const STORES=[
 {n:'Sandton City',a:'83 Rivonia Rd, Sandhurst, Sandton',h:'Open until 21:00',x:62,y:28},
 {n:'Plato Gardens',a:'12 Garden Ave, Gardens',h:'Open until 18:00',x:30,y:60},
@@ -56,3 +54,9 @@ const STORES=[
 {n:'Melrose Arch',a:'1 Melrose Blvd, Melrose Arch',h:'Open until 21:00',x:70,y:62},
 {n:'Fourways',a:'Cnr Witkoppen & William Nicol Dr, Fourways',h:'Open until 20:00',x:36,y:14},
 {n:'Parkhurst',a:'4th Ave, Parkhurst',h:'Open until 18:00',x:44,y:74}];
+
+// Items not listed here show "coming soon" / "ask in store" so nothing wrong is ever shown.
+const INFO={
+ 'Iced Latte':{cal:395,allergens:['Dairy','Gluten'],ingredients:'Espresso, milk, ice',nutrition:{Calories:'395 kcal'}}
+ // 'Fresh Croissant':{cal:300,allergens:['Gluten','Dairy','Egg'],ingredients:'Flour, butter, ...',nutrition:{Calories:'300 kcal',Protein:'6 g',Fat:'17 g',Carbs:'31 g'}},
+};

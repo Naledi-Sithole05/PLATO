@@ -1,10 +1,27 @@
-// Store locator page with fake map. Click map to move "you"; stores sort by fake distance.
-const dist=t=>Math.hypot(t.x-S.you.x,(t.y-S.you.y)*.7)*.45;
-function locator(){$('#app').innerHTML=`<div class="loc"><div><h1 style="font-size:34px;text-align:left;margin-bottom:6px">Find a Platō</h1><p style="color:var(--mut);margin-bottom:18px;font-size:14px">Click the map to set your location. Closest stores are listed first.</p><input class="f" style="margin:0 0 16px" id="sq" placeholder="Search by store or suburb" oninput="S.sel=null;locDraw()"><div id="sl"></div></div>
- <div class="map" id="map" onclick="mapClick(event)"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="22" cy="30" rx="12" ry="9" fill="#dbe8d2"/><ellipse cx="78" cy="82" rx="14" ry="9" fill="#dbe8d2"/><path d="M0 88Q30 78 55 92T100 86V100H0z" fill="#d9e6f0"/><g stroke="#fff" stroke-width="2.4" fill="none" vector-effect="non-scaling-stroke"><path d="M0 40L100 55"/><path d="M45 0L55 100"/><path d="M0 70L100 20"/><path d="M75 0L65 100"/><path d="M0 15L100 12"/></g></svg><div id="pins"></div></div></div>`;locDraw()}
-function locDraw(){const q=($('#sq')||{value:''}).value.toLowerCase();
- const all=STORES.map((t,k)=>({...t,k,d:dist(t)})).sort((a,b)=>a.d-b.d);if(S.sel==null)S.sel=all[0].k;
- const l=all.filter(t=>(t.n+t.a).toLowerCase().includes(q));
- $('#sl').innerHTML=l.map((t,i)=>`<div class="st ${t.k==S.sel?'on':''}" onclick="S.sel=${t.k};locDraw()">${t.k==all[0].k?'<span class="tag">Closest to you</span>':''}<div class="row"><b>${t.n}</b><span>${t.d.toFixed(1)} km</span></div><p>${t.a}<br>${t.h}</p>${t.k==S.sel?`<button class="btn" style="margin-top:12px" onclick="event.stopPropagation();S.store=${t.k};location.hash='';toast('Ordering from ${t.n}')">Order from here</button>`:''}</div>`).join('')||'<p class="msg">No stores found.</p>';
- $('#pins').innerHTML=STORES.map((t,k)=>`<button class="pin ${k==S.sel?'on':''}" style="left:${t.x}%;top:${t.y}%" onclick="event.stopPropagation();S.sel=${k};locDraw()">${t.n}</button>`).join('')+`<div class="you" style="left:${S.you.x}%;top:${S.you.y}%"></div>`}
-function mapClick(e){const r=$('#map').getBoundingClientRect();S.you={x:(e.clientX-r.left)/r.width*100,y:(e.clientY-r.top)/r.height*100};S.sel=null;locDraw()}
+// Step 1 of ordering: product customisation window (size, milk, extras, quantity) then Add to Order.
+let cur;
+function open1(id){try{
+ const i=ITEMS.find(x=>x.id==id);if(!i)return;
+ cur={i,pick:{},ex:{},qty:1};G[i.g].forEach(([n])=>cur.pick[n]=0);
+ const inf=INFO[i.name]||{};
+ const grp=G[i.g].map(([n,o])=>`<div class="grp"><h4>${n}</h4><div class="opts">${o.map((v,k)=>`<button class="pill" data-g="${n}" data-k="${k}" onclick="pickOpt(this)">${v[0]}${v[1]?' +'+R(v[1]):''}</button>`).join('')}</div></div>`).join('');
+ const ex=i.g=='drink'?`<div class="grp"><h4>Extras</h4>${EXTRAS.map((e,k)=>`<div class="ex"><label><input type="checkbox" onchange="cur.ex[${k}]=this.checked;price()"> ${e[0]}</label><span>+${R(e[1])}</span></div>`).join('')}</div>`:'';
+ const tags=[inf.cal?inf.cal+' Cal':'',...(inf.allergens||[])].filter(Boolean).map(t=>`<span class="tag2">${t}</span>`).join('');
+ const nut=inf.nutrition?Object.entries(inf.nutrition).map(([k,v])=>`<div class="row"><span>${k}</span><span>${v}</span></div>`).join(''):'Nutritional information coming soon.';
+ $('#modal').innerHTML=`<div class="row" style="justify-content:flex-end"><button onclick="hide()" aria-label="Close" style="font-size:20px">✕</button></div>
+ <div class="pm"><div class="big ${i.img?'':'noimg'}">${i.img?`<img src="${i.img}" alt="${i.name}" onerror="this.parentNode.classList.add('noimg');this.remove()">`:''}<span>Add image</span></div>
+ <div><h2>${i.name}</h2><div class="pr">${R(i.price)}</div><p class="d">${i.desc}</p><div class="tags">${tags}</div>
+ <details><summary>Ingredients</summary><p>${inf.ingredients||i.desc}</p></details>
+ <details><summary>Nutritional Information</summary><div>${nut}</div></details>
+ <details><summary>Allergens</summary><p>${inf.allergens?inf.allergens.join(', '):'Please ask in store for allergen information.'}</p></details></div></div>
+ ${grp}${ex}
+ <div class="row" style="margin:22px 0 14px"><b>Quantity</b><div class="qty"><button onclick="cur.qty=Math.max(1,cur.qty-1);price()">−</button><span id="qn">1</span><button onclick="cur.qty++;price()">+</button></div></div>
+ <div class="row" style="gap:10px"><button class="btn alt" style="width:32%" onclick="hide()">Not now</button><button class="btn" id="addb" onclick="add()"></button></div>`;
+ document.querySelectorAll('#modal .pill[data-k="0"]').forEach(b=>b.classList.add('on'));price();show()
+}catch(e){console.error('Could not open product popup:',e)}}
+function pickOpt(b){b.parentNode.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));b.classList.add('on');cur.pick[b.dataset.g]=+b.dataset.k;price()}
+function unit(){let u=cur.i.price;G[cur.i.g].forEach(([n,o])=>u+=o[cur.pick[n]][1]);EXTRAS.forEach((e,k)=>{if(cur.ex[k]&&cur.i.g=='drink')u+=e[1]});return u}
+function price(){$('#qn').textContent=cur.qty;$('#addb').textContent=`Add to Order · ${R(unit()*cur.qty)}`}
+function add(){const sp=G[cur.i.g].map(([n,o])=>o[cur.pick[n]][0]).concat(EXTRAS.filter((e,k)=>cur.ex[k]&&cur.i.g=='drink').map(e=>e[0])).join(' · ');
+ const key=cur.i.id+sp,l=S.cart.find(x=>x.key==key);l?l.qty+=cur.qty:S.cart.push({key,name:cur.i.name,sp,unit:unit(),qty:cur.qty});
+ save();hide();upd();toast(`Added ${cur.i.name} to your order`)}
