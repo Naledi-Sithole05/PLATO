@@ -1,10 +1,65 @@
 // Store locator page with fake map. Click map to move "you"; stores sort by fake distance.
-const dist=t=>Math.hypot(t.x-S.you.x,(t.y-S.you.y)*.7)*.45;
-function locator(){$('#app').innerHTML=`<div class="loc"><div><h1 style="font-size:34px;text-align:left;margin-bottom:6px">Find a Platō</h1><p style="color:var(--mut);margin-bottom:18px;font-size:14px">Click the map to set your location. Closest stores are listed first.</p><input class="f" style="margin:0 0 16px" id="sq" placeholder="Search by store or suburb" oninput="S.sel=null;locDraw()"><div id="sl"></div></div>
- <div class="map" id="map" onclick="mapClick(event)"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="22" cy="30" rx="12" ry="9" fill="#dbe8d2"/><ellipse cx="78" cy="82" rx="14" ry="9" fill="#dbe8d2"/><path d="M0 88Q30 78 55 92T100 86V100H0z" fill="#d9e6f0"/><g stroke="#fff" stroke-width="2.4" fill="none" vector-effect="non-scaling-stroke"><path d="M0 40L100 55"/><path d="M45 0L55 100"/><path d="M0 70L100 20"/><path d="M75 0L65 100"/><path d="M0 15L100 12"/></g></svg><div id="pins"></div></div></div>`;locDraw()}
-function locDraw(){const q=($('#sq')||{value:''}).value.toLowerCase();
- const all=STORES.map((t,k)=>({...t,k,d:dist(t)})).sort((a,b)=>a.d-b.d);if(S.sel==null)S.sel=all[0].k;
- const l=all.filter(t=>(t.n+t.a).toLowerCase().includes(q));
- $('#sl').innerHTML=l.map((t,i)=>`<div class="st ${t.k==S.sel?'on':''}" onclick="S.sel=${t.k};locDraw()">${t.k==all[0].k?'<span class="tag">Closest to you</span>':''}<div class="row"><b>${t.n}</b><span>${t.d.toFixed(1)} km</span></div><p>${t.a}<br>${t.h}</p>${t.k==S.sel?`<button class="btn" style="margin-top:12px" onclick="event.stopPropagation();S.store=${t.k};location.hash='';toast('Ordering from ${t.n}')">Order from here</button>`:''}</div>`).join('')||'<p class="msg">No stores found.</p>';
- $('#pins').innerHTML=STORES.map((t,k)=>`<button class="pin ${k==S.sel?'on':''}" style="left:${t.x}%;top:${t.y}%" onclick="event.stopPropagation();S.sel=${k};locDraw()">${t.n}</button>`).join('')+`<div class="you" style="left:${S.you.x}%;top:${S.you.y}%"></div>`}
-function mapClick(e){const r=$('#map').getBoundingClientRect();S.you={x:(e.clientX-r.left)/r.width*100,y:(e.clientY-r.top)/r.height*100};S.sel=null;locDraw()}
+const dist = (t) => Math.hypot(t.x - S.you.x, (t.y - S.you.y) * 0.7) * 0.45;
+function locator() {
+    $('#app').innerHTML = `<div class="loc">
+<div>
+<h1 style="font-size:34px;text-align:left;margin-bottom:6px">Find a Platō</h1>
+<p style="color:var(--mut);margin-bottom:18px;font-size:14px">Click the map to set your location. Closest stores are listed first.</p>
+<input class="f" style="margin:0 0 16px" id="sq" placeholder="Search by store or suburb" oninput="S.sel=null;locDraw()">
+<div id="sl">
+</div>
+</div>
+ <div class="map" id="map" onclick="mapClick(event)">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+<ellipse cx="22" cy="30" rx="12" ry="9" fill="#dbe8d2"/>
+<ellipse cx="78" cy="82" rx="14" ry="9" fill="#dbe8d2"/>
+<path d="M0 88Q30 78 55 92T100 86V100H0z" fill="#d9e6f0"/>
+<g stroke="#fff" stroke-width="2.4" fill="none" vector-effect="non-scaling-stroke">
+<path d="M0 40L100 55"/>
+<path d="M45 0L55 100"/>
+<path d="M0 70L100 20"/>
+<path d="M75 0L65 100"/>
+<path d="M0 15L100 12"/>
+</g>
+</svg>
+<div id="pins">
+</div>
+</div>
+</div>`;
+    locDraw();
+}
+function locDraw() {
+    const q = ($('#sq') || { value: '' }).value.toLowerCase();
+    const all = STORES.map((t, k) => ({ ...t, k, d: dist(t) })).sort((a, b) => a.d - b.d);
+    if (S.sel == null) S.sel = all[0].k;
+    const l = all.filter((t) => (t.n + t.a).toLowerCase().includes(q));
+    $('#sl').innerHTML =
+        l
+            .map(
+                (
+                    t,
+                    i,
+                ) => `<div class="st ${t.k == S.sel ? 'on' : ''}" onclick="S.sel=${t.k};locDraw()">${t.k == all[0].k ? '<span class="tag">Closest to you</span>' : ''}<div class="row">
+<b>${t.n}</b>
+<span>${t.d.toFixed(1)} km</span>
+</div>
+<p>${t.a}<br>${t.h}</p>${t.k == S.sel ? `<button class="btn" style="margin-top:12px" onclick="event.stopPropagation();S.store=${t.k};location.hash='';toast('Ordering from ${t.n}')">Order from here</button>` : ''}</div>`,
+            )
+            .join('') || '<p class="msg">No stores found.</p>';
+    $('#pins').innerHTML =
+        STORES.map(
+            (t, k) =>
+                `<button class="pin ${k == S.sel ? 'on' : ''}" style="left:${t.x}%;top:${t.y}%" onclick="event.stopPropagation();S.sel=${k};locDraw()">${t.n}</button>`,
+        ).join('') +
+        `<div class="you" style="left:${S.you.x}%;top:${S.you.y}%">
+</div>`;
+}
+function mapClick(e) {
+    const r = $('#map').getBoundingClientRect();
+    S.you = {
+        x: ((e.clientX - r.left) / r.width) * 100,
+        y: ((e.clientY - r.top) / r.height) * 100,
+    };
+    S.sel = null;
+    locDraw();
+}
